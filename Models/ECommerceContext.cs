@@ -49,17 +49,19 @@ namespace SampleEcommerceApi.Models
 
             modelBuilder.Entity<Advertisement>(entity =>
             {
-                entity.HasKey(e => e.AdsId)
-                    .HasName("PK__Advertis__46AAC65A03A58F2C");
+                entity.HasNoKey();
 
-                entity.Property(e => e.AdsId).HasColumnName("AdsID");
+                entity.Property(e => e.AdsId)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("AdsID");
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.HasOne(d => d.Product)
-                    .WithMany(p => p.Advertisements)
+                    .WithMany()
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK__Advertise__Produ__48CFD27E");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Advertise__Produ__45F365D3");
             });
 
             modelBuilder.Entity<Cart>(entity =>
@@ -87,9 +89,13 @@ namespace SampleEcommerceApi.Models
 
             modelBuilder.Entity<Notification>(entity =>
             {
+                entity.HasNoKey();
+
                 entity.Property(e => e.Body)
                     .HasMaxLength(1000)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.Title)
                     .HasMaxLength(200)
@@ -98,10 +104,10 @@ namespace SampleEcommerceApi.Models
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.Notifications)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Notificat__UserI__4F7CD00D");
+                    .HasConstraintName("FK__Notificat__UserI__4AB81AF0");
             });
 
             modelBuilder.Entity<Offer>(entity =>
@@ -111,8 +117,6 @@ namespace SampleEcommerceApi.Models
                 entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 
                 entity.Property(e => e.DeletedOn).HasColumnType("datetime");
-
-                entity.Property(e => e.DiscountAmount).HasColumnType("money");
 
                 entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
 
@@ -144,9 +148,16 @@ namespace SampleEcommerceApi.Models
 
                 entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
 
-                entity.Property(e => e.TotalAmount).HasColumnType("money");
+                entity.Property(e => e.PaymentType)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
+
+                entity.HasOne(d => d.DeliveryAddressNavigation)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.DeliveryAddress)
+                    .HasConstraintName("FK__Orders__Delivery__38996AB5");
 
                 entity.HasOne(d => d.Offer)
                     .WithMany(p => p.Orders)
@@ -173,51 +184,43 @@ namespace SampleEcommerceApi.Models
                 entity.HasOne(d => d.Offer)
                     .WithMany(p => p.OrderItems)
                     .HasForeignKey(d => d.OfferId)
-                    .HasConstraintName("FK__OrderItem__Offer__3C69FB99");
+                    .HasConstraintName("FK__OrderItem__Offer__3D5E1FD2");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderItems)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderItem__Order__3A81B327");
+                    .HasConstraintName("FK__OrderItem__Order__3B75D760");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.OrderItems)
                     .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__OrderItem__Produ__3B75D760");
+                    .HasConstraintName("FK__OrderItem__Produ__3C69FB99");
             });
 
             modelBuilder.Entity<PaymentDetail>(entity =>
             {
                 entity.HasKey(e => e.PaymentId)
-                    .HasName("PK__PaymentD__9B556A586883C54C");
+                    .HasName("PK__PaymentD__9B556A5849A8A786");
 
                 entity.Property(e => e.PaymentId).HasColumnName("PaymentID");
 
-                entity.Property(e => e.Amount).HasColumnType("money");
-
                 entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 
-                entity.Property(e => e.OrderId).HasColumnName("OrderID");
-
                 entity.Property(e => e.Provider)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Reason).HasMaxLength(50);
-
-                entity.HasOne(d => d.Order)
-                    .WithMany(p => p.PaymentDetails)
-                    .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__PaymentDe__Order__3F466844");
             });
 
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.Active)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("active");
 
                 entity.Property(e => e.Category)
                     .HasMaxLength(250)
@@ -225,49 +228,44 @@ namespace SampleEcommerceApi.Models
 
                 entity.Property(e => e.CreatedOn).HasColumnType("datetime");
 
-                entity.Property(e => e.DeletedOn).HasColumnType("datetime");
-
                 entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
 
-                entity.Property(e => e.Price).HasColumnType("money");
-
                 entity.Property(e => e.ProductName).IsRequired();
-
-                entity.Property(e => e.StorageId).HasColumnName("StorageID");
-
-                entity.HasOne(d => d.Storage)
-                    .WithMany(p => p.Products)
-                    .HasForeignKey(d => d.StorageId)
-                    .HasConstraintName("FK__Products__Storag__286302EC");
             });
 
             modelBuilder.Entity<Question>(entity =>
             {
-                entity.HasKey(e => e.Qid)
-                    .HasName("PK__Question__CAB147CB0F70FDD4");
-
-                entity.Property(e => e.Qid).HasColumnName("QID");
+                entity.HasNoKey();
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.Qid)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("QID");
 
                 entity.Property(e => e.Question1).HasColumnName("Question");
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.HasOne(d => d.Product)
-                    .WithMany(p => p.Questions)
+                    .WithMany()
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK__Questions__Produ__534D60F1");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Questions__Produ__4D94879B");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.Questions)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Questions__UserI__52593CB8");
+                    .HasConstraintName("FK__Questions__UserI__4CA06362");
             });
 
             modelBuilder.Entity<Rating>(entity =>
             {
+                entity.HasNoKey();
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.Property(e => e.Rating1).HasColumnName("Rating");
@@ -275,16 +273,16 @@ namespace SampleEcommerceApi.Models
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.HasOne(d => d.Product)
-                    .WithMany(p => p.Ratings)
+                    .WithMany()
                     .HasForeignKey(d => d.ProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Ratings__Product__4222D4EF");
+                    .HasConstraintName("FK__Ratings__Product__412EB0B6");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.Ratings)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Ratings__UserID__4316F928");
+                    .HasConstraintName("FK__Ratings__UserID__4222D4EF");
             });
 
             modelBuilder.Entity<Storage>(entity =>
@@ -293,23 +291,30 @@ namespace SampleEcommerceApi.Models
 
                 entity.Property(e => e.StorageId).HasColumnName("StorageID");
 
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
                 entity.Property(e => e.StorageName)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SupplierId).HasColumnName("SupplierID");
 
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Storages)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK__Storage__Product__286302EC");
+
                 entity.HasOne(d => d.Supplier)
                     .WithMany(p => p.Storages)
                     .HasForeignKey(d => d.SupplierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Storage__Supplie__25869641");
+                    .HasConstraintName("FK__Storage__Supplie__276EDEB3");
             });
 
             modelBuilder.Entity<Supplier>(entity =>
             {
                 entity.Property(e => e.SupplierId).HasColumnName("SupplierID");
+
+                entity.Property(e => e.Slocation).HasColumnName("SLocation");
 
                 entity.Property(e => e.SupplierName)
                     .HasMaxLength(50)
@@ -324,16 +329,13 @@ namespace SampleEcommerceApi.Models
 
                 entity.Property(e => e.DeletedOn).HasColumnType("datetime");
 
-                entity.Property(e => e.FirstName)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.FirstName).HasMaxLength(50);
 
                 entity.Property(e => e.LastLoggedIn).HasColumnType("datetime");
 
                 entity.Property(e => e.LastName).HasMaxLength(50);
 
                 entity.Property(e => e.MailId)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("MailID");
@@ -343,16 +345,13 @@ namespace SampleEcommerceApi.Models
                 entity.Property(e => e.ModifiedOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Password)
-                    .IsRequired()
                     .HasMaxLength(16)
                     .IsUnicode(false);
             });
 
             modelBuilder.Entity<UserAddress>(entity =>
             {
-                entity.Property(e => e.AddressLine1)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.AddressLine1).HasMaxLength(50);
 
                 entity.Property(e => e.AddressLine2).HasMaxLength(50);
 
@@ -362,9 +361,7 @@ namespace SampleEcommerceApi.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Country)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.Country).HasMaxLength(50);
 
                 entity.Property(e => e.MailId)
                     .HasMaxLength(50)
@@ -372,9 +369,7 @@ namespace SampleEcommerceApi.Models
 
                 entity.Property(e => e.Mobile).HasMaxLength(50);
 
-                entity.Property(e => e.PostalCode)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                entity.Property(e => e.PostalCode).HasMaxLength(50);
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
@@ -387,51 +382,56 @@ namespace SampleEcommerceApi.Models
 
             modelBuilder.Entity<UserPayment>(entity =>
             {
+                entity.HasNoKey();
+
                 entity.Property(e => e.Expiry).HasColumnType("datetime");
 
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
                 entity.Property(e => e.PaymentType)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ProviderType)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Reference)
-                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserPayments)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__UserPayme__UserI__45F365D3");
+                    .HasConstraintName("FK__UserPayme__UserI__440B1D61");
             });
 
             modelBuilder.Entity<WishList>(entity =>
             {
+                entity.HasNoKey();
+
                 entity.ToTable("WishList");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.HasOne(d => d.Product)
-                    .WithMany(p => p.WishLists)
+                    .WithMany()
                     .HasForeignKey(d => d.ProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__WishList__Produc__4BAC3F29");
+                    .HasConstraintName("FK__WishList__Produc__47DBAE45");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.WishLists)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__WishList__UserID__4CA06362");
+                    .HasConstraintName("FK__WishList__UserID__48CFD27E");
             });
 
             OnModelCreatingPartial(modelBuilder);

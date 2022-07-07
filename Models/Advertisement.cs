@@ -11,7 +11,7 @@ namespace SampleEcommerceApi.Models
         public string AdName { get; set; }
         public string AdDescription { get; set; }
         public string AdImageUrl { get; set; }
-        public int? ProductId { get; set; }
+        public int ProductId { get; set; }
 
         public virtual Product Product { get; set; }
     }

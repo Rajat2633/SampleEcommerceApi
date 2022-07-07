@@ -9,7 +9,7 @@ namespace SampleEcommerceApi.Models
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public int Rating1 { get; set; }
+        public int? Rating1 { get; set; }
         public int UserId { get; set; }
         public string Review { get; set; }
 

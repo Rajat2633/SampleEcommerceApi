@@ -18,9 +18,9 @@ namespace SampleEcommerceApi.Models
         public string OfferDescription { get; set; }
         public int? ProductId { get; set; }
         public int? DiscountPercentage { get; set; }
-        public decimal? DiscountAmount { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime CreatedOn { get; set; }
+        public double? DiscountAmount { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? CreatedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
         public bool? IsDeleted { get; set; }
         public DateTime? DeletedOn { get; set; }

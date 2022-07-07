@@ -14,7 +14,7 @@ namespace SampleEcommerceApi.Models
 
         public int SupplierId { get; set; }
         public string SupplierName { get; set; }
-        public string Location { get; set; }
+        public string Slocation { get; set; }
 
         public virtual ICollection<Storage> Storages { get; set; }
     }

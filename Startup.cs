@@ -28,6 +28,8 @@ namespace SampleEcommerceApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+            
             services.AddDbContext<ECommerceContext>(options =>
 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
@@ -46,7 +48,7 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SampleEcommerceApi v1"));
             }
-
+            app.UseCors(options => options.WithOrigins("http://localhost:44331/").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
             app.UseHttpsRedirection();
 
             app.UseRouting();

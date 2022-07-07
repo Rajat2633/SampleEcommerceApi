@@ -10,13 +10,8 @@ namespace SampleEcommerceApi.Models
         public User()
         {
             Carts = new HashSet<Cart>();
-            Notifications = new HashSet<Notification>();
             Orders = new HashSet<Order>();
-            Questions = new HashSet<Question>();
-            Ratings = new HashSet<Rating>();
             UserAddresses = new HashSet<UserAddress>();
-            UserPayments = new HashSet<UserPayment>();
-            WishLists = new HashSet<WishList>();
         }
 
         public int UserId { get; set; }
@@ -25,9 +20,9 @@ namespace SampleEcommerceApi.Models
         public string MailId { get; set; }
         public string Mobile { get; set; }
         public string Password { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsDeleted { get; set; }
+        public DateTime? CreatedOn { get; set; }
+        public bool? IsActive { get; set; }
+        public bool? IsDeleted { get; set; }
         public DateTime? DeletedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
         public bool? IsLoggedIn { get; set; }
@@ -35,12 +30,7 @@ namespace SampleEcommerceApi.Models
         public bool? WantAlerts { get; set; }
 
         public virtual ICollection<Cart> Carts { get; set; }
-        public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
-        public virtual ICollection<Question> Questions { get; set; }
-        public virtual ICollection<Rating> Ratings { get; set; }
         public virtual ICollection<UserAddress> UserAddresses { get; set; }
-        public virtual ICollection<UserPayment> UserPayments { get; set; }
-        public virtual ICollection<WishList> WishLists { get; set; }
     }
 }
